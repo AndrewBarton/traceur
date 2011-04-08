@@ -1,0 +1,15 @@
+#summary How to get Traceur up and running on your machine.
+
+= Getting Traceur =
+
+You can pull the code down using Subversion or git (though git-svn). To get it using git-svn, do:
+
+{{{
+$ mkdir traceur # it won't create a dir for you
+$ cd traceur
+$ git svn clone -s https://traceur-compiler.googlecode.com/svn
+}}}
+
+I got a 205 Bad Gateway error the first time I tried that, but the second try worked. If it's working, your computer will get nice and warm and you'll see a bunch of text spew by. Once it's done, you've got it!
+
+To see if everything works, try RunningTests
