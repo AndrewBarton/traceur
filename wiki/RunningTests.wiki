@@ -2,10 +2,20 @@
 
 = Running Tests =
 
-Run chrome with these flags:
+Run Chrome with these flags:
 
+<pre>
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files &> /dev/null &
+</pre>
+
+To run this in Firefox you need to change a pref:
+
+<pre>
+security.fileuri.strict_origin_policy = false
+</pre>
 
 Navigate to:
 
+<pre>
 traceur/test/test.html
+</pre>
