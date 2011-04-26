@@ -24,9 +24,9 @@ We verify that Traceur works by running a test suite. You can run this in the br
 
 You'll need to launch Chrome with an argument to let scripts load other scripts from disk: `--allow-file-access-from-files`. On Mac OS X, you can do this from the Terminal using:
 
-{{{
+<pre>
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files &> /dev/null &
-}}}
+</pre>
 
 === Configuring Firefox ===
 
