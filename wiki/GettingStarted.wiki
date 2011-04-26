@@ -10,6 +10,46 @@ $ cd traceur
 $ git svn clone -s https://traceur-compiler.googlecode.com/svn
 }}}
 
-I got a 205 Bad Gateway error the first time I tried that, but the second try worked. If it's working, your computer will get nice and warm and you'll see a bunch of text spew by. Once it's done, you've got it!
+We've seen a couple of 205 Bad Gateway errors sometimes. If you get that shake your fist at the sky in anger and try again. You'll know it's working when computer gets nice and warm and you see a bunch of text spew by. Once it's done, you've got it!
 
-To see if everything works, try RunningTests
+To see if everything works, try running the tests...
+
+= Running Tests =
+
+== Allowing File Access ==
+
+We verify that Traceur works by running a test suite. You can run this in the browser or *(TODO)* from the command line. Since the test scripts access other local files, you'll need to tweak your browser a bit to tell it you want to allow that:
+
+=== Configuring Chrome ===
+
+You'll need to launch Chrome with an argument to let scripts load other scripts from disk: `--allow-file-access-from-files`. On Mac OS X, you can do this from the Terminal using:
+
+{{{
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files &> /dev/null &
+}}}
+
+=== Configuring Firefox ===
+
+To run this in Firefox you need to change a preference so that the scripts can load other files outside of their directory ([http://kb.mozillazine.org/Security.fileuri.strict_origin_policy strict_origin_policy]). To do that:
+
+  # Navigate to `about:config`. (Accept the warning if shown.)
+  # In the "Filter" box, enter: `security.fileuri.strict_origin_policy` and hit enter.
+  # If it's value is currently `true`, double-click the result line to toggle it to `false`.
+
+== Running the Tests ==
+
+Now that you've got your browser loosened up, open the main test page. From the root of the Traceur repository, you can find it in:
+
+{{{
+trunk/test/alltests.html
+}}}
+
+Click "Start" and hope for the delicious green bars of success.
+
+== Compiling Your Own Code ==
+
+*(TODO)*
+
+== Running Traceur Code Directly ==
+
+*(TODO)*
