@@ -14,21 +14,27 @@ We've seen a couple of 205 Bad Gateway errors sometimes. If you get that shake y
 
 To see if everything works, try running the tests...
 
-= Running Tests =
+= Running the Tests =
 
-== Allowing File Access ==
+Traceur has three kinds of tests: *unit tests* validate that various classes within Traceur do what they're supposed to do. *Feature tests* are small standalone chunks of Traceur code. The tests compile and run them, and validate that they do what they're supposed to. Finally, the *baseline tests* push a big pile of Javascript through Traceur (currently the Closure libraries) and validate that nothing gets broken in the process.
 
-We verify that Traceur works by running a test suite. You can run this in the browser or *(TODO)* from the command line. Since the test scripts access other local files, you'll need to tweak your browser a bit to tell it you want to allow that:
+The feature tests are likely the most interesting. They show what kinds of extensions to Javascript we're prototyping, both what they look like and how they behave. If you want a quick introduction to what kinds of stuff we're trying, hunt through the `feature/` directory and see.
 
-=== Configuring Chrome ===
+== From a Browser ==
+
+=== Allowing File Access ===
+
+Since the test scripts access other local files, you'll need to tweak your browser a bit to tell it you want to allow that before you can run the tests in a browser:
+
+==== Configuring Chrome ====
 
 You'll need to launch Chrome with an argument to let scripts load other scripts from disk: `--allow-file-access-from-files`. On Mac OS X, you can do this from the Terminal using:
 
-<pre>
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files &> /dev/null &
-</pre>
+{{{
+$ /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files &> /dev/null &
+}}}
 
-=== Configuring Firefox ===
+==== Configuring Firefox ====
 
 To run this in Firefox you need to change a preference so that the scripts can load other files outside of their directory ([http://kb.mozillazine.org/Security.fileuri.strict_origin_policy strict_origin_policy]). To do that:
 
@@ -36,15 +42,23 @@ To run this in Firefox you need to change a preference so that the scripts can l
   # In the "Filter" box, enter: `security.fileuri.strict_origin_policy` and hit enter.
   # If it's value is currently `true`, double-click the result line to toggle it to `false`.
 
-== Running the Tests ==
+=== Running the Tests ===
 
-Now that you've got your browser loosened up, open the main test page. From the root of the Traceur repository, you can find it in:
+Now that you've got your browser loosened up, open a test page. From the root of the Traceur repository, you can find them in:
 
-{{{
-trunk/test/alltests.html
-}}}
+  * Unit tests: `svn/test/alltests.html`
+  * Feature tests: `svn/test/featuretests.html`
 
 Click "Start" and hope for the delicious green bars of success.
+
+== From the Command Line ==
+
+We're working on supporting running the tests on [http://nodejs.org/ Node]. If you have Node installed, you can run the feature tests like this:
+
+{{{
+$ cd svn/test/ # Need to run from within test/ dir.
+$ node testfeatures.js
+}}}
 
 == Compiling Your Own Code ==
 
