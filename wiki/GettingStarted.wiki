@@ -44,12 +44,19 @@ To run this in Firefox you need to change a preference so that the scripts can l
 
 === Running the Tests ===
 
-Now that you've got your browser loosened up, open a test page. From the root of the Traceur repository, you can find them in:
+Now that you've got your browser loosened up, open a test page. To run the unit tests and feature tests, open:
 
-  * Unit tests: `svn/test/alltests.html`
-  * Feature tests: `svn/test/featuretests.html`
+{{{
+svn/test/alltests.html
+}}}
 
-Click "Start" and hope for the delicious green bars of success.
+Click "Start" and hope for the delicious green bars of success. To run just the feature tests:
+
+{{{
+svn/test/feature/feature_test.html
+}}}
+
+You can run specific unit tests by opening any `_test.html` file under `unit/`.
 
 == From the Command Line ==
 
