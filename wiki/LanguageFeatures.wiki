@@ -2,14 +2,14 @@
 
 = Language Features =
 
-  * classes
-  * traits
-  * modules (in progress)
-  * iterators/ for each
-  * generators
-  * deferred functions
-  * block scoped bindings
-  * destructuring assignment
-  * default parameters
-  * rest parameters
-  * spread operator
+  * classes - _Strawman_
+  * traits - _Strawman_
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:modules modules] (in progress)
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:iterators iterators]/ for each
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:generators generators]
+  * [http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions deferred functions] - _Strawman_
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings block scoped bindings]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring destructuring assignment]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:rest_parameters rest parameters]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:spread spread operator]
