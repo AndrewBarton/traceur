@@ -156,7 +156,7 @@ function inorder(t) {
 
 == Deferred Functions ==
 
-[http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions Deferred functions] allow you to write asynchronous non-blocking code without writing callback functions, which don't compose well. With deferred functions, you can use JavaScript control flow constructs that you're used to, inline with the rest of your code.
+[http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions Deferred functions] allow you to write asynchronous non-blocking code without writing callback functions, which don't compose well. With deferred functions, you can use !JavaScript control flow constructs that you're used to, inline with the rest of your code.
 
 {{{
 function deferredAnimate(element) {
