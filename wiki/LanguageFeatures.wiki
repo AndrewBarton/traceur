@@ -2,14 +2,97 @@
 
 = Language Features =
 
-  * [Classes]
-  * [Traits]
-  * [Modules]
-  * [Iterators] / for each
-  * [Generators]
-  * [DeferredFunctions Deferred functions]
-  * [BlockScopedBindings Block scoped bindings]
-  * [DestructuringAssignment Destructuring assignment]
-  * [DefaultParameters Default parameters]
-  * [RestParameters Rest parameters]
-  * [SpreadOperator Spread operator]
+  * [LanguageFeatures#Classes classes] - _Strawman_
+  * [LanguageFeatures#Traits traits] - _Strawman_
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:modules modules] (in progress)
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:iterators iterators]/ for each
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:generators generators]
+  * [http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions deferred functions] - _Strawman_
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings block scoped bindings]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring destructuring assignment]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:rest_parameters rest parameters]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:spread spread operator]
+
+
+== Classes ==
+
+[http://en.wikipedia.org/wiki/Class_(computer_programming) Classes] are a great way to reuse code. Several JS libraries provide classes and inheritance, but they aren't mutually compatible. Our implementation is inspired by Allen Wirfs-Brock's [http://wiki.ecmascript.org/doku.php?id=strawman:obj_initialiser_class_abstraction class initializers proposal]. Here's an example taken from slides to a presentation:
+{{{
+class SlideParts {
+  new(slideEl) {
+    // fields:
+    this.slideEl = slideEl;
+    this.currentPartIndex = -1;
+    this.partDetails = [];
+    this.init();
+  }
+
+  // methods:
+  function init() { /*...*/ }
+  function comingFromPrev() { /*...*/ }
+  function comingFromNext() { /*...*/ }
+  function next() { /*...*/ }
+  function prev() { /*...*/ }
+}
+}}}
+
+Here's an example of subclassing an HTML button:
+{{{
+class CustomButton : HTMLButtonElement {
+  new() {
+    this.value = 'Custom Button';
+  }
+}
+var button = new CustomButton();
+document.body.appendChild(button);
+}}}
+
+== Traits ==
+
+http://traitsjs.org/ describes it best:
+ Traits are a flexible language feature to factor out and recombine reusable pieces of code. They are a more robust alternative to multiple inheritance or mixins. They are more robust because name clashes must be resolved explicitly by composers, and because trait composition is order-independent (hence more declarative). To put it simply: if you combine two traits that define a method with the same name, your program will fail. Traits won't automatically give precedence to either one.
+
+Our implementation is inspired by [http://wiki.ecmascript.org/doku.php?id=strawman:classes_with_trait_composition classes with trait composition].
+
+The syntax is still evolving but right now it looks like this:
+{{{
+trait ComparableTrait {
+  requires lessThan; // this.lessThan(other) -> boolean
+  requires equals; // this.equals(other) -> boolean
+
+  function lessThanOrEquals(other) {
+    return this.lessThan(other) || this.equals(other);
+  }
+  function greaterThan(other) {
+    return other.lessThan(this);
+  }
+  function greaterThanOrEquals(other) {
+    return other.lessThan(this) || this.equals(other);
+  }
+  function notEquals(other) {
+    return !(this.equals(other));
+  }
+}
+
+class Interval {
+  mixin ComparableTrait;
+
+  new(min, max) {
+    this.start = min;
+    this.end = max;
+    this.size = max - min - 1;
+  }
+  function lessThan(ival) {
+    return this.end <= ival.start;
+  }
+  function equals(ival) {
+    return this.start == ival.start && this.end == ival.end;
+  }
+}
+
+var i1 = new Interval(0, 5);
+var i2 = new Interval(7, 12);
+alert('' + i1 + ' == ' + i2 + ': ' + i1.equals(i2)); // false
+alert('' + i1 + ' < ' + i2 + ': ' + i1.lessThan(i2)); // true
+}}}
