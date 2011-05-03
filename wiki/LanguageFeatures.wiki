@@ -2,8 +2,8 @@
 
 = Language Features =
 
-  * classes - _Strawman_
-  * traits - _Strawman_
+  * classes - _Strawman_ - inspired by [http://wiki.ecmascript.org/doku.php?id=strawman:obj_initialiser_class_abstraction class initializers]
+  * traits - _Strawman_ - inspired by [http://wiki.ecmascript.org/doku.php?id=strawman:classes_with_trait_composition classes with traits]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:modules modules] (in progress)
   * [http://wiki.ecmascript.org/doku.php?id=harmony:iterators iterators]/ for each
   * [http://wiki.ecmascript.org/doku.php?id=harmony:generators generators]
