@@ -55,7 +55,8 @@ Open this page in your browser and you'll get nothing. The problem is it has no 
 <html> 
   <head>
     ...
-    <script src="http://traceur-compiler.googlecode.com/svn/trunk/src/traceur.js" type="text/javascript"></script> 
+    <script src="http://traceur-compiler.googlecode.com/svn/branches/v0.10/src/traceur.js" 
+        type="text/javascript"></script> 
   </head>
   ...
 </html>
@@ -69,8 +70,10 @@ The `traceur.js` script is the main entrypoint for the Traceur-to-Javascript com
 <html> 
   <head>
     ...
-    <script src="http://traceur-compiler.googlecode.com/svn/trunk/src/traceur.js" type="text/javascript"></script> 
-    <script src="http://traceur-compiler.googlecode.com/svn/trunk/src/bootstrap.js" type="text/javascript"></script> 
+    <script src="http://traceur-compiler.googlecode.com/svn/branches/v0.10/src/traceur.js"
+        type="text/javascript"></script> 
+    <script src="http://traceur-compiler.googlecode.com/svn/branches/v0.10/src/bootstrap.js"
+        type="text/javascript"></script> 
   </head>
   ...
 </html>
