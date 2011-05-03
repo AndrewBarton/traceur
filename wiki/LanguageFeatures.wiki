@@ -11,7 +11,7 @@
   * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings block scoped bindings]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring destructuring assignment]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters]
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:rest_parameters rest parameters]
+  * [LanguageFeatures#Rest-Parameters rest parameters]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:spread spread operator]
 
 
@@ -96,3 +96,17 @@ var i2 = new Interval(7, 12);
 alert('' + i1 + ' == ' + i2 + ': ' + i1.equals(i2)); // false
 alert('' + i1 + ' < ' + i2 + ': ' + i1.lessThan(i2)); // true
 }}}
+
+== Rest Parameters ==
+
+[http://wiki.ecmascript.org/doku.php?id=harmony:rest_parameters Rest parameters] allows your functions to have variable number of arguments without using the `arguments` object.
+
+{{{
+function push(array, ...items) {
+  items.forEach(function(item) {
+    array.push(item);
+  });
+}
+}}}
+
+The rest parameter is an instance of `Array` so all the array methods just works.
