@@ -109,7 +109,7 @@ module Profile {
 }
 
 module ProfileView {
-  import Profile.{firstName, lastName, id};
+  import Profile.{firstName, lastName, year};
 
   function setHeader(element) {
     element.textContent = firstName + ' ' + lastName;
