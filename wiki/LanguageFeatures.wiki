@@ -116,6 +116,7 @@ module ProfileView {
   }
   // rest of module
 }
+}}}
 
 == Iterators and For Each ==
 
