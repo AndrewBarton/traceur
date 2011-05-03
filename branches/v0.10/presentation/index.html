@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
-<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='chrome=1'>
+<meta charset="utf-8">
 <title>JavaScript</title>
 <script src='../src/traceur.js'></script>
 <script src='../src/bootstrap.js'></script>
@@ -62,18 +63,6 @@
       </p>
       <p>
         Creative in attempts to build large apps. Notably GWT.
-      </p>
-    </div>
-  </div>
-
-  <div class='slide'>
-    <div class='content'>
-      <img src='http://a5.mzstatic.com/us/r1000/030/Purple/45/28/f7/mzl.yagtukvx.320x480-75.jpg' class='center'>
-    </div>
-    <div class='note'>
-      <p>
-        Still, its easier to do rich apps for closed platforms rather than
-        the open web platform.
       </p>
     </div>
   </div>
@@ -211,6 +200,7 @@ PacMan.prototype.eat = function() { ... };
     </div>
   </div>
 
+<!--
   <div class='slide'>
     <div class='content'>
       <div>
@@ -271,6 +261,7 @@ PacMan.prototype = Object.create(
     <div class='note'>
     </div>
   </div>
+-->
 
   <div class='slide'>
     <div class='content'>
@@ -535,6 +526,7 @@ export TreeControl = ...;
     </div>
   </div>
 
+<!--
   <div class='slide'>
     <div class='content'>
       <div>
@@ -654,7 +646,6 @@ while (iterator.moveNext()) {
     </div>
   </div>
 
-<!--
   <div class='slide'>
     <div class='content'>
       <div>
@@ -686,7 +677,6 @@ for (var i: fib(10)) { print(i); }
     enumerated using for: construct just like arrays.
     </div>
   </div>
--->
 
   <div class='slide'>
     <div class='content'>
@@ -716,7 +706,6 @@ for (var node: allNodes(document)) {
     </div>
   </div>
 
-<!--
   <div class='slide'>
     <div class='content'>
       <div>
@@ -749,7 +738,6 @@ var nodes = allNodes(document);
     Can we return 1 node at a time using iterator protocol?
     </div>
   </div>
--->
 
   <div class='slide'>
     <div class='content'>
@@ -875,6 +863,7 @@ for (var node: allNodes(document)) {
      Compiler gets it right every time.
     </div>
   </div>
+-->
 
   <div class='slide'>
     <div class='content'>
@@ -1108,9 +1097,12 @@ animateicon();
 
   <div class='slide'>
     <div class='content'>
-      <h1>
-        <a href='http://code.google.com/p/traceur-compiler' target='_blank'>Traceur</a>
-      </h1>
+      <div>
+        <h1>
+          <a href='http://code.google.com/p/traceur-compiler' target='_blank'>Traceur</a>
+        </h1>
+        <h3>http://code.google.com/p/traceur-compiler</h3>
+      </div>
     </div>
     <div class='note'>
         You can find more information on the Traceur Google Code site.
@@ -1120,5 +1112,6 @@ animateicon();
 
 <script src='../demo/classifier.js'></script>
 <script type='text/traceur'>
+  var initialize; // need this for modules
   initialize();
 </script>
