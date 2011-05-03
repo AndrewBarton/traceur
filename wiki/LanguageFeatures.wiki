@@ -98,7 +98,24 @@ alert(i1 + ' < ' + i2 + ': ' + i1.greaterThan(i2)); // false
 
 == Modules ==
 
-[http://wiki.ecmascript.org/doku.php?id=harmony:modules Modules] are a work in progress. Once finished, the syntax will work as described in the spec.
+[http://wiki.ecmascript.org/doku.php?id=harmony:modules Modules] are not ready to use yet in Traceur, but they are partially implemented. Modules try to solve many issues in dependencies and deployment, allowing users to name external modules, import specific exported names from those modules, and keep these names separate.
+
+{{{
+module Profile {
+  // module code
+  export FirstName;
+  export LastName;
+  export Id;
+}
+
+module ProfileView {
+  import Profile.{FirstName, LastName, Id};
+
+  function setHeader(element) {
+    element.innerHTML = FirstName + " " + LastName;
+  }
+  // rest of module
+}
 
 == Iterators and For Each ==
 
