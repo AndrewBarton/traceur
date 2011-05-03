@@ -11,7 +11,7 @@
   * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings block scoped bindings]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring destructuring assignment]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters]
-  * [LanguageFeatures#Rest-Parameters rest parameters]
+  * [LanguageFeatures#Rest_Parameters rest parameters]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:spread spread operator]
 
 
