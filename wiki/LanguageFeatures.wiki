@@ -103,16 +103,16 @@ alert(i1 + ' < ' + i2 + ': ' + i1.greaterThan(i2)); // false
 {{{
 module Profile {
   // module code
-  export FirstName;
-  export LastName;
-  export Id;
+  export var firstName = 'David';
+  export var lastName = 'Belle';
+  export var year = 1973;
 }
 
 module ProfileView {
-  import Profile.{FirstName, LastName, Id};
+  import Profile.{firstName, lastName, id};
 
   function setHeader(element) {
-    element.innerHTML = FirstName + " " + LastName;
+    element.textContent = firstName + ' ' + lastName;
   }
   // rest of module
 }
