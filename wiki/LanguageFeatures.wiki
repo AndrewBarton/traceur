@@ -8,7 +8,7 @@
   * [LanguageFeatures#Iterators_and_For_Each Iterators and For Each]
   * [LanguageFeatures#Generators Generators]
   * [LanguageFeatures#Deferred_Functions Deferred Functions] - _Strawman_
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings Block Scoped Bindings]
+  * [LanguageFeatures#Block_Scoped_Bindings Block Scoped Bindings]
   * [LanguageFeatures#Destructuring_Assignment Destructuring Assignment]
   * [LanguageFeatures#Default_Parameters Default Parameters]
   * [LanguageFeatures#Rest_Parameters Rest Parameters]
@@ -189,6 +189,25 @@ deferredAnimate(document.getElementById('box'));
 
 Deferred functions use await expressions to suspend execution and return an object that represents the continuation of the function.
 
+== Block Scoped Bindings ==
+
+[http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings Block scoped bindings] provide scopes other than the function and top level scope. This ensures your variables don't leak out of the scope they're defined:
+{{{
+{
+  const tmp = a;
+  a = b;
+  b = tmp;
+}
+alert(tmp); // error: 'tmp' is not defined.
+}}}
+It's also useful for capturing variables in a loop:
+{{{
+let funcs = [];
+for (let i : [4,5,6]) {
+  funcs.push(function() { return i; });
+}
+alert(funcs[0]()); // prints 4
+}}}
 
 == Destructuring Assignment ==
 
@@ -197,6 +216,17 @@ Deferred functions use await expressions to suspend execution and return an obje
 var a, b, c, d;
 [a, [b], c, d] = ['hello', [', ', 'junk'], ['world']];
 alert(a + b + c); // hello, world
+}}}
+It can also destructure objects:
+{{{
+var pt = { x: 123, y: 444 };
+var rect = { topLeft: { x: 1, y: 2 }, bottomRight: {x: 3, y: 4} };
+// ... other code ...
+var {x, y} = pt; // unpack the point
+var {topLeft: {x: x1, y: y1}, bottomRight: {x: x2, y: y2}} = rect;
+
+alert(x + y); // 567
+alert([x1, y1, x2, y2].join(',')) // 1,2,3,4
 }}}
 
 == Default Parameters ==
@@ -251,4 +281,4 @@ var a = [1];
 var b = [2, 3, 4];
 var c = [6, 7];
 var d = [0, ...a, ...b, 5, ...c];
-}}} 
+}}}
