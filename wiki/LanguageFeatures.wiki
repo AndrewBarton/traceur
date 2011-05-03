@@ -7,7 +7,7 @@
   * [LanguageFeatures#Modules Modules] (in progress)
   * [LanguageFeatures#Iterators_and_For_Each Iterators and For Each]
   * [LanguageFeatures#Generators Generators]
-  * [LanguageFeatures#Deferred_Functions Deferred Functions]
+  * [LanguageFeatures#Deferred_Functions Deferred Functions] - _Strawman_
   * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings Block Scoped Bindings]
   * [LanguageFeatures#Destructuring_Assignment Destructuring Assignment]
   * [LanguageFeatures#Default_Parameters Default Parameters]
