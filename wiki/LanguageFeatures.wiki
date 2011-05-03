@@ -6,7 +6,7 @@
   * [LanguageFeatures#Traits Traits] - _Strawman_
   * [LanguageFeatures#Modules Modules] (in progress)
   * [LanguageFeatures#Iterators_and_For_Each Iterators and For Each]
-  * [LanguageFeatures#generators Generators]
+  * [LanguageFeatures#Generators Generators]
   * [http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions Deferred Functions] - _Strawman_
   * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings Block Scoped Bindings]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring Destructuring Assignment]
