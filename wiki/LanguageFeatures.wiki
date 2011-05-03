@@ -50,9 +50,10 @@ document.body.appendChild(button);
 
 == Traits ==
 
-Sometimes you want to create a reusable chunk of code that you can use in your classes. Traits make it easy to group methods together as a unit, and mix this unit into one or more classes, merging the features of the trait into the class. Traits are similar to multiple inheritance and mixins from other languages, but they're more robust because name clashes must be resolved explicitly by composers, and because trait composition is order-independent (hence more declarative).
+http://traitsjs.org/ describes it best:
+ Traits are a flexible language feature to factor out and recombine reusable pieces of code. They are a more robust alternative to multiple inheritance or mixins. They are more robust because name clashes must be resolved explicitly by composers, and because trait composition is order-independent (hence more declarative). To put it simply: if you combine two traits that define a method with the same name, your program will fail. Traits won't automatically give precedence to either one.
 
-Our implementation is inspired by http://traitsjs.org/ and  [http://wiki.ecmascript.org/doku.php?id=strawman:classes_with_trait_composition classes with trait composition].
+Our implementation is inspired by [http://wiki.ecmascript.org/doku.php?id=strawman:classes_with_trait_composition classes with trait composition].
 
 The syntax is still evolving but right now it looks like this:
 {{{
@@ -109,3 +110,33 @@ function push(array, ...items) {
 }}}
 
 The rest parameter is an instance of `Array` so all the array methods just works.
+
+== Spread Operator ==
+
+The [http://wiki.ecmascript.org/doku.php?id=harmony:spread spread operator] is like the reverse of [LanguageFeatures#Rest_Parameters rest parameters]. It allows you to expand an array into multiple formal parameters.
+
+{{{
+function printf(format, ...parameters) {
+  // ...
+}
+
+function push(array, ...items) {
+  array.push(...items);
+}
+
+function add(x, y) {
+  return x + y;
+}
+
+var numbers = [4, 38];
+add(...numbers);  // 42
+}}}
+
+The spread operator also works in array literals which allows you to combine multiple arrays more easily.
+
+{{{
+var a = [1];
+var b = [2, 3, 4];
+var c = [6, 7];
+var d = [0, ...a, ...b, 5, ...c];
+}}} 
