@@ -10,7 +10,7 @@ $ cd traceur
 $ git svn clone -s https://traceur-compiler.googlecode.com/svn
 }}}
 
-We've seen a couple of 205 Bad Gateway errors sometimes. If you get that shake your fist at the sky in anger and try again. You'll know it's working when computer gets nice and warm and you see a bunch of text spew by. Once it's done, you've got it!
+You'll know it's working when computer gets nice and warm and you see a bunch of text spew by. Once it's done, you've got it!
 
 To see if everything works, try running the tests...
 
@@ -47,13 +47,13 @@ To run this in Firefox you need to change a preference so that the scripts can l
 Now that you've got your browser loosened up, open a test page. To run the unit tests and feature tests, open:
 
 {{{
-svn/test/alltests.html
+test/alltests.html
 }}}
 
 Click "Start" and hope for the delicious green bars of success. To run just the feature tests:
 
 {{{
-svn/test/feature/feature_test.html
+test/feature/feature_test.html
 }}}
 
 You can run specific unit tests by opening any `_test.html` file under `unit/`.
@@ -63,6 +63,6 @@ You can run specific unit tests by opening any `_test.html` file under `unit/`.
 We're working on supporting running the tests on [http://nodejs.org/ Node]. If you have Node installed, you can run the feature tests like this:
 
 {{{
-$ cd svn/test/ # Need to run from within test/ dir.
+$ cd test/ # Need to run from within test/ dir.
 $ node testfeatures.js
 }}}
