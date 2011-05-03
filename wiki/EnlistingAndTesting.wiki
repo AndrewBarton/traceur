@@ -1,4 +1,4 @@
-#summary How to get Traceur up and running on your machine.
+#summary How to get started engineering.
 
 = Getting Traceur =
 
