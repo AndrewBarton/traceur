@@ -2,17 +2,17 @@
 
 = Language Features =
 
-  * [LanguageFeatures#Classes classes] - _Strawman_
-  * [LanguageFeatures#Traits traits] - _Strawman_
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:modules modules] (in progress)
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:iterators iterators]/ for each
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:generators generators]
-  * [http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions deferred functions] - _Strawman_
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings block scoped bindings]
-  * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring destructuring assignment]
-  * [LanguageFeatures#Default_Parameters default parameters]
-  * [LanguageFeatures#Rest_Parameters rest parameters]
-  * [LanguageFeatures#Spread_Operator spread operator]
+  * [LanguageFeatures#Classes Classes] - _Strawman_
+  * [LanguageFeatures#Traits Traits] - _Strawman_
+  * [LanguageFeatures#Modules Modules] (in progress)
+  * [LanguageFeatures#Iterators_and_For_Each Iterators and For Each]
+  * [LanguageFeatures#generators Generators]
+  * [http://wiki.ecmascript.org/doku.php?id=strawman:deferred_functions Deferred Functions] - _Strawman_
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:block_scoped_bindings Block Scoped Bindings]
+  * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring Destructuring Assignment]
+  * [LanguageFeatures#Default_Parameters Default Parameters]
+  * [LanguageFeatures#Rest_Parameters Rest Parameters]
+  * [LanguageFeatures#Spread_Operator Spread Operator]
 
 
 == Classes ==
@@ -96,6 +96,63 @@ alert(i1 + ' == ' + i2 + ': ' + i1.notEquals(i2)); // true
 alert(i1 + ' < ' + i2 + ': ' + i1.greaterThan(i2)); // false
 }}}
 
+== Modules ==
+
+[http://wiki.ecmascript.org/doku.php?id=harmony:modules Modules] are a work in progress. Once finished, the syntax will work as described in the spec.
+
+== Iterators and For Each ==
+
+[http://en.wikipedia.org/wiki/Iterator Iterators] are objects that can traverse a container. It's a useful way to make a class work inside a for each loop. The interface is similar to the [http://wiki.ecmascript.org/doku.php?id=harmony:iterators iterators] proposal. Returning an iterator looks like this:
+{{{
+function iterateElements(array) {
+  return {
+    __iterator__: function() {
+      var index = 0;
+      var current;
+      return {
+        get current() {
+          return current;
+        },
+        moveNext: function() {
+          if (index < array.length) {
+            current = array[index++];
+            return true;
+          }
+          return false;
+        }
+      };
+    }
+  };
+}
+}}}
+
+Iteration using a for each loop looks like this:
+{{{
+for (var i : iterateElements([4,5,6])) {
+  doSomething(i);
+}
+}}}
+
+== Generators ==
+
+[http://wiki.ecmascript.org/doku.php?id=harmony:generators Generators] make it easy to create iterators. Instead of tracking state yourself and implementing `__iterator__`, you just use `yield` (or `yield for` to yield each element in a list):
+
+{{{
+// A binary tree class.
+function Tree(label, left, right) {
+  this.label = label;
+  this.left = left;
+  this.right = right;
+}
+// A recursive generator that iterates the Tree labels in-order.
+function inorder(t) {
+  if (t) {
+    yield for inorder(t.left);
+    yield t.label;
+    yield for inorder(t.right);
+  }
+}
+}}}
 
 == Default Parameters ==
 
