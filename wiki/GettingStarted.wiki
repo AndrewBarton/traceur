@@ -4,7 +4,7 @@ Traceur is a compiler that takes Javascript including some new enhancements like
 
 = Hello, World! =
 
-To demonstrate, we'll build a little web page that includes a chunk of embedded Traceur code. When the page loads, it will execute that code and stick "Hello, World" onto the page.
+To demonstrate, we'll build a little web page that includes a chunk of embedded Traceur code. When the page loads, it will execute that code and stick "Hello, World" onto the page. You can see the final result [http://code.google.com/p/traceur-compiler/source/browse/trunk/example/hello.html here].
 
 First, let's build the skeleton of a page:
 
