@@ -12,7 +12,7 @@
   * [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring destructuring assignment]
   * [http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters]
   * [LanguageFeatures#Rest_Parameters rest parameters]
-  * [LanguageFeatures#Spread spread operator]
+  * [LanguageFeatures#Spread_Operator spread operator]
 
 
 == Classes ==
