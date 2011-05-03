@@ -1,3 +1,5 @@
+#summary How To Try Out Traceur
+
 Traceur is a compiler that takes Javascript including some new enhancements like classes and generators, and compiles it down to regular Javascript that runs in your browser. Traceur itself is written in Javascript, which means you can host the compiler directly in your pages and compile Traceur code on the fly.
 
 = Hello, World! =
