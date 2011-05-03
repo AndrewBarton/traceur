@@ -99,7 +99,7 @@ alert('' + i1 + ' < ' + i2 + ': ' + i1.lessThan(i2)); // true
 
 == Default Parameters ==
 
-[http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters] allows your functions to have optional arguments without needing to check for `undefined`.
+[http://wiki.ecmascript.org/doku.php?id=harmony:parameter_default_values default parameters] allow your functions to have optional arguments without needing to check for `undefined`.
 
 {{{
 function slice(list, indexA = 0, indexB = list.length) {
