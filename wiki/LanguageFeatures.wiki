@@ -92,8 +92,8 @@ class Interval {
 
 var i1 = new Interval(0, 5);
 var i2 = new Interval(7, 12);
-alert(i1 + ' == ' + i2 + ': ' + i1.equals(i2)); // false
-alert(i1 + ' < ' + i2 + ': ' + i1.lessThan(i2)); // true
+alert(i1 + ' == ' + i2 + ': ' + i1.notEquals(i2)); // true
+alert(i1 + ' < ' + i2 + ': ' + i1.greaterThan(i2)); // false
 }}}
 
 
