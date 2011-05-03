@@ -1,0 +1,13 @@
+classes - _Strawman_ - inspired by [http://wiki.ecmascript.org/doku.php?id=strawman:obj_initialiser_class_abstraction class initializers]
+
+= Introduction =
+
+Add your content here.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
