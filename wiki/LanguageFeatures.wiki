@@ -135,6 +135,8 @@ for (let element : [1, 2, 3]) {
 }
 }}}
 
+Note: The for-colon loop syntax is not yet agreed upon by TC39.
+
 You can also create your own iterable objects. Normally this is done via the `yield` keyword (discussed below in [LanguageFeatures#Generators Generators]) but it could be done explicitly by returning an object that has `__iterator__`:
 {{{
 function iterateElements(array) {
