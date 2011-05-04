@@ -235,8 +235,7 @@ for (var func : funcs) {
 
 [http://wiki.ecmascript.org/doku.php?id=harmony:destructuring Destructuring assignment] is a nice way to assign or initialize several variables at once:
 {{{
-var a, b, c, d;
-[a, [b], c, d] = ['hello', [', ', 'junk'], ['world']];
+var [a, [b], c, d] = ['hello', [', ', 'junk'], ['world']];
 alert(a + b + c); // hello, world
 }}}
 It can also destructure objects:
