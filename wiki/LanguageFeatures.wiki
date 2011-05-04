@@ -279,10 +279,6 @@ The rest parameter is an instance of `Array` so all the array methods just works
 The [http://wiki.ecmascript.org/doku.php?id=harmony:spread spread operator] is like the reverse of [LanguageFeatures#Rest_Parameters rest parameters]. It allows you to expand an array into multiple formal parameters.
 
 {{{
-function printf(format, ...parameters) {
-  // ...
-}
-
 function push(array, ...items) {
   array.push(...items);
 }
