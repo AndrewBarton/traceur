@@ -169,9 +169,9 @@ function iterateElements(array) {
 
 {{{
 // A binary tree class.
-function Tree(label, left, right) {
-  this.label = label;
+function Tree(left, label, right) {
   this.left = left;
+  this.label = label;
   this.right = right;
 }
 // A recursive generator that iterates the Tree labels in-order.
