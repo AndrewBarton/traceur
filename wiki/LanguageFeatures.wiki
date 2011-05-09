@@ -22,7 +22,7 @@ These features are [http://wiki.ecmascript.org/doku.php?id=harmony:proposals pro
 
 [http://en.wikipedia.org/wiki/Class_(computer_programming) Classes] are a great way to reuse code. Several JS libraries provide classes and inheritance, but they aren't mutually compatible. Our implementation is inspired by Allen Wirfs-Brock's [http://wiki.ecmascript.org/doku.php?id=strawman:obj_initialiser_class_abstraction class initializers proposal]. Here's an example:
 {{{
-class Monster extends Character {
+class Monster : Character {
   new(x, y, name) {
     super(x, y);
     this.name = name;
@@ -35,9 +35,9 @@ class Monster extends Character {
 
   var health_ = 100;
 
-  get isAlive { return this.health > 0; }
-  get health { return this.health_; }
-  set health {
+  get isAlive() { return this.health > 0; }
+  get health() { return this.health_; }
+  set health(value) {
     if (value < 0) throw new Error('Health must be non-negative.');
     this.health_ = value;
   }
