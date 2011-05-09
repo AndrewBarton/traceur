@@ -1,4 +1,5 @@
 #summary Traceur Language Features
+#labels Featured
 
 = Language Features =
 
@@ -13,6 +14,7 @@
   * [LanguageFeatures#Default_Parameters Default Parameters]
   * [LanguageFeatures#Rest_Parameters Rest Parameters]
   * [LanguageFeatures#Spread_Operator Spread Operator]
+  * [LanguageFeatures#Object_Initialiser_Shorthand Object Initialiser Shorthand] - _Strawman_
 
 These features are [http://wiki.ecmascript.org/doku.php?id=harmony:proposals proposals] for ECMAScript Harmony unless otherwise noted.
 
@@ -301,4 +303,18 @@ var a = [1];
 var b = [2, 3, 4];
 var c = [6, 7];
 var d = [0, ...a, ...b, 5, ...c];
+}}}
+
+
+== Object Initialiser Shorthand ==
+
+This [http://wiki.ecmascript.org/doku.php?id=strawman:object_initialiser_shorthand strawman] allows you to skip repeating yourself when the property name and property value are the same in an object literal.
+
+{{{
+function getPoint() {
+  var x = ...;
+  var y = ...;
+  ...
+  return {x, y};
+}
 }}}
