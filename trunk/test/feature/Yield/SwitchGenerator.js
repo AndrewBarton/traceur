@@ -1,4 +1,4 @@
-function switchGenerator(val) {
+function* switchGenerator(val) {
   switch (val) {
     case 1:
       yield val;
@@ -23,7 +23,7 @@ function switchGenerator(val) {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

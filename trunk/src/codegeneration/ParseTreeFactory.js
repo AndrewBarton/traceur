@@ -29,11 +29,13 @@ traceur.define('codegeneration', function() {
   var ArrayLiteralExpression = traceur.syntax.trees.ArrayLiteralExpression;
   var ArrayPattern = traceur.syntax.trees.ArrayPattern;
   var BinaryOperator = traceur.syntax.trees.BinaryOperator;
+  var BindingIdentifier = traceur.syntax.trees.BindingIdentifier;
   var Block = traceur.syntax.trees.Block;
   var BreakStatement = traceur.syntax.trees.BreakStatement;
   var CallExpression = traceur.syntax.trees.CallExpression;
   var CaseClause = traceur.syntax.trees.CaseClause;
   var Catch = traceur.syntax.trees.Catch;
+  var CascadeExpression = traceur.syntax.trees.CascadeExpression;
   var ClassDeclaration = traceur.syntax.trees.ClassDeclaration;
   var CommaExpression = traceur.syntax.trees.CommaExpression;
   var ConditionalExpression = traceur.syntax.trees.ConditionalExpression;
@@ -45,7 +47,7 @@ traceur.define('codegeneration', function() {
   var ExpressionStatement = traceur.syntax.trees.ExpressionStatement;
   var FieldDeclaration = traceur.syntax.trees.FieldDeclaration;
   var Finally = traceur.syntax.trees.Finally;
-  var ForEachStatement = traceur.syntax.trees.ForEachStatement;
+  var ForOfStatement = traceur.syntax.trees.ForOfStatement;
   var ForInStatement = traceur.syntax.trees.ForInStatement;
   var ForStatement = traceur.syntax.trees.ForStatement;
   var FormalParameterList = traceur.syntax.trees.FormalParameterList;
@@ -143,26 +145,6 @@ traceur.define('codegeneration', function() {
   }
 
   /**
-   * @param {IdentifierToken|FormalParameterList} parameter
-   * @return {Array.<string>}
-   */
-  function createParameters(parameter) {
-    if (parameter instanceof IdentifierToken)
-      return [parameter.value];
-
-    var builder = [];
-
-    parameter.parameters.forEach(function(parameter) {
-      if (!parameter.isRestParameter()) {
-        // TODO: array and object patterns
-        builder.push(parameter.identifierToken.value);
-      }
-    });
-
-    return builder;
-  }
-
-  /**
    * Either creates an array from the arguments, or if the first argument is an
    * array, creates a new array with its elements followed by the other
    * arguments.
@@ -193,7 +175,7 @@ traceur.define('codegeneration', function() {
   function createParameterList(arg0, var_args) {
     if (typeof arg0 == 'string') {
       // var_args of strings
-      var parameterList = map(arguments, createIdentifierExpression);
+      var parameterList = map(arguments, createBindingIdentifier);
       return new FormalParameterList(null, parameterList);
     }
 
@@ -202,11 +184,11 @@ traceur.define('codegeneration', function() {
 
     if (arg0 instanceof IdentifierToken) {
       return new FormalParameterList(
-          null, [createIdentifierExpression(arg0)]);
+          null, [createBindingIdentifier(arg0)]);
     }
 
     // Array.<string>
-    var builder = arg0.map(createIdentifierExpression);
+    var builder = arg0.map(createBindingIdentifier);
     return new FormalParameterList(null, builder);
   }
 
@@ -225,7 +207,7 @@ traceur.define('codegeneration', function() {
       builder.push(
           isRestParameter ?
               createRestParameter(parameterName) :
-              createIdentifierExpression(parameterName));
+              createBindingIdentifier(parameterName));
     }
 
     return new FormalParameterList(null, builder);
@@ -352,6 +334,17 @@ traceur.define('codegeneration', function() {
    */
   function createBinaryOperator(left, operator, right) {
     return new BinaryOperator(null, left, operator, right);
+  }
+
+  /**
+   * @param {string|IdentifierToken} identifier
+   * @return {BindingIdentifier}
+   */
+  function createBindingIdentifier(identifier) {
+    if (typeof identifier == 'string') {
+      identifier = createIdentifierToken(identifier);
+    }
+    return new BindingIdentifier(null, identifier);
   }
 
   /**
@@ -485,12 +478,20 @@ traceur.define('codegeneration', function() {
   }
 
   /**
-   * @param {IdentifierToken} exceptionName
+   * @param {BindingIdentifier|IdentifierToken} identifier
    * @param {ParseTree} catchBody
    * @return {Catch}
    */
-  function createCatch(exceptionName, catchBody) {
-    return new Catch(null, exceptionName, catchBody);
+  function createCatch(identifier, catchBody) {
+    if (identifier instanceof IdentifierToken) {
+      identifier = createBindingIdentifier(exceptionName);
+    }
+
+    return new Catch(null, identifier, catchBody);
+  }
+
+  function createCascadeExpression(operand, expressions) {
+    return new CascadeExpression(null, operand, expressions)
   }
 
   /**
@@ -606,10 +607,10 @@ traceur.define('codegeneration', function() {
    * @param {VariableDeclarationList} initializer
    * @param {ParseTree} collection
    * @param {ParseTree} body
-   * @return {ForEachStatement}
+   * @return {ForOfStatement}
    */
-  function createForEachStatement(initializer, collection, body) {
-    return new ForEachStatement(null, initializer, collection, body);
+  function createForOfStatement(initializer, collection, body) {
+    return new ForOfStatement(null, initializer, collection, body);
   }
 
   /**
@@ -641,20 +642,21 @@ traceur.define('codegeneration', function() {
   function createFunctionExpressionFormals(formalParameters, functionBody) {
     if (formalParameters instanceof Array)
       formalParameters = createParameterList(formalParameters);
-    return new FunctionDeclaration(null, null, false, formalParameters,
+    return new FunctionDeclaration(null, null, false, false, formalParameters,
         functionBody);
   }
 
   /**
-   * @param {string|IdentifierToken} name
+   * @param {string|IdentifierToken|BindingIdentifier} name
    * @param {FormalParameterList} formalParameterList
    * @param {Block} functionBody
    * @return {FunctionDeclaration}
    */
   function createFunctionDeclaration(name, formalParameterList, functionBody) {
-    if (typeof name == 'string')
-      name = createIdentifierToken(name);
-    return new FunctionDeclaration(null, name, false, formalParameterList,
+    if (!(name instanceof BindingIdentifier)) {
+      name = createBindingIdentifier(name);
+    }
+    return new FunctionDeclaration(null, name, false, false, formalParameterList,
         functionBody);
   }
 
@@ -664,8 +666,8 @@ traceur.define('codegeneration', function() {
    * @return {FunctionDeclaration}
    */
   function createFunctionExpression(formalParameterList, functionBody) {
-    return new FunctionDeclaration(null, null, false, formalParameterList,
-        functionBody);
+    return new FunctionDeclaration(null, null, false, false,
+                                   formalParameterList, functionBody);
   }
 
   // [static] get propertyName () { ... }
@@ -688,6 +690,8 @@ traceur.define('codegeneration', function() {
   function createIdentifierExpression(identifier) {
     if (typeof identifier == 'string')
       identifier = createIdentifierToken(identifier);
+    else if (identifier instanceof BindingIdentifier)
+      identifier = identifier.identifierToken;
     return new IdentifierExpression(null, identifier);
   }
 
@@ -1033,9 +1037,6 @@ traceur.define('codegeneration', function() {
     }
 
     var identifier = identifierOrDeclarations;
-    if (typeof identifier == 'string')
-      identifier = createIdentifierToken(identifier);
-
     return createVariableDeclarationList(
         binding, [createVariableDeclaration(identifier, initializer)]);
   }
@@ -1047,7 +1048,7 @@ traceur.define('codegeneration', function() {
    */
   function createVariableDeclaration(identifier, initializer) {
     if (typeof identifier == 'string' || identifier instanceof IdentifierToken)
-      identifier = createIdentifierExpression(identifier);
+      identifier = createBindingIdentifier(identifier);
     return new VariableDeclaration(null, identifier, initializer);
   }
 
@@ -1061,8 +1062,6 @@ traceur.define('codegeneration', function() {
     if (listOrBinding instanceof VariableDeclarationList)
       return new VariableStatement(null, listOrBinding);
     var binding = listOrBinding;
-    if (typeof identifier == 'string')
-      identifier = createIdentifierToken(identifier);
     var list = createVariableDeclarationList(binding, identifier, initializer);
     return createVariableStatement(list);
   }
@@ -1105,6 +1104,7 @@ traceur.define('codegeneration', function() {
       createAssignmentExpression: createAssignmentExpression,
       createAssignmentStatement: createAssignmentStatement,
       createBinaryOperator: createBinaryOperator,
+      createBindingIdentifier: createBindingIdentifier,
       createBlock: createBlock,
       createBooleanLiteral: createBooleanLiteral,
       createBooleanLiteralToken: createBooleanLiteralToken,
@@ -1116,6 +1116,7 @@ traceur.define('codegeneration', function() {
       createCallStatement: createCallStatement,
       createCaseClause: createCaseClause,
       createCatch: createCatch,
+      createCascadeExpression: createCascadeExpression,
       createClassDeclaration: createClassDeclaration,
       createCommaExpression: createCommaExpression,
       createConditionalExpression: createConditionalExpression,
@@ -1134,7 +1135,7 @@ traceur.define('codegeneration', function() {
       createFalseLiteral: createFalseLiteral,
       createFieldDeclaration: createFieldDeclaration,
       createFinally: createFinally,
-      createForEachStatement: createForEachStatement,
+      createForOfStatement: createForOfStatement,
       createForInStatement: createForInStatement,
       createForStatement: createForStatement,
       createFunctionDeclaration: createFunctionDeclaration,
@@ -1162,7 +1163,6 @@ traceur.define('codegeneration', function() {
       createParameterList: createParameterList,
       createParameterListWithRestParams: createParameterListWithRestParams,
       createParameterReference: createParameterReference,
-      createParameters: createParameters,
       createParenExpression: createParenExpression,
       createPostfixExpression: createPostfixExpression,
       createProgram: createProgram,

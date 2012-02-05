@@ -2,23 +2,23 @@ var SingletonInstance = { }
 var SingletonInstanceTwo = { }
 
 class NewA {
-  class new() { return SingletonInstance; }
+  static constructor() { return SingletonInstance; }
 }
 
-class NewB : NewA {
+class NewB extends NewA {
 }
 
 class SkipNewA {
-  class new() { return SingletonInstance; }
+  static constructor() { return SingletonInstance; }
 }
 
-class SkipNewB : SkipNewA {}
+class SkipNewB extends SkipNewA {}
 
-class SkipNewC : SkipNewB {
-  class new() { return SingletonInstanceTwo; }
+class SkipNewC extends SkipNewB {
+  static constructor() { return SingletonInstanceTwo; }
 }
 
-class SkipNewD : SkipNewC {}
+class SkipNewD extends SkipNewC {}
 
 // ----------------------------------------------------------------------------
 

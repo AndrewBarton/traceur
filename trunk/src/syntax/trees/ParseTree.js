@@ -16,13 +16,9 @@ traceur.define('syntax.trees', function() {
   'use strict';
 
   var assert = traceur.assert;
-  var ParseTreeType = traceur.syntax.trees.ParseTreeType;
+  var ParseTreeType = {};
 
   var typeToNameMap = Object.create(null);
-
-  // Add the exceptions
-  typeToNameMap[ParseTreeType.NULL] = 'NullTree';
-  typeToNameMap[ParseTreeType.IMPORT_PATH] = 'ImportPath';
 
   function getCapitalizedName(type) {
     var name = type.toString();
@@ -93,7 +89,7 @@ traceur.define('syntax.trees', function() {
   ParseTree.prototype = {
     /** @return {boolean} */
     isNull: function() {
-      return this.type === ParseTreeType.NULL;
+      return this.type === ParseTreeType.NULL_TREE;
     },
 
     /** @return {boolean} */
@@ -124,6 +120,7 @@ traceur.define('syntax.trees', function() {
         case ParseTreeType.MEMBER_LOOKUP_EXPRESSION:
         case ParseTreeType.CALL_EXPRESSION:
         case ParseTreeType.FUNCTION_DECLARATION:
+        case ParseTreeType.QUASI_LITERAL_EXPRESSION:
           return true;
         case ParseTreeType.PAREN_EXPRESSION:
           return this.expression.isLeftHandSideExpression();
@@ -136,24 +133,26 @@ traceur.define('syntax.trees', function() {
     /** @return {boolean} */
     isArrowFunctionExpression: function() {
       switch (this.type) {
+        case ParseTreeType.ARRAY_LITERAL_EXPRESSION:
         case ParseTreeType.ARROW_FUNCTION_EXPRESSION:
-        case ParseTreeType.FUNCTION_DECLARATION:
         case ParseTreeType.BINARY_OPERATOR:
-        case ParseTreeType.THIS_EXPRESSION:
+        case ParseTreeType.CALL_EXPRESSION:
+        case ParseTreeType.CASCADE_EXPRESSION:
+        case ParseTreeType.CONDITIONAL_EXPRESSION:
+        case ParseTreeType.FUNCTION_DECLARATION:
         case ParseTreeType.IDENTIFIER_EXPRESSION:
         case ParseTreeType.LITERAL_EXPRESSION:
-        case ParseTreeType.ARRAY_LITERAL_EXPRESSION:
-        case ParseTreeType.OBJECT_LITERAL_EXPRESSION:
-        case ParseTreeType.MISSING_PRIMARY_EXPRESSION:
-        case ParseTreeType.CONDITIONAL_EXPRESSION:
-        case ParseTreeType.UNARY_EXPRESSION:
-        case ParseTreeType.POSTFIX_EXPRESSION:
         case ParseTreeType.MEMBER_EXPRESSION:
-        case ParseTreeType.NEW_EXPRESSION:
-        case ParseTreeType.CALL_EXPRESSION:
         case ParseTreeType.MEMBER_LOOKUP_EXPRESSION:
+        case ParseTreeType.MISSING_PRIMARY_EXPRESSION:
+        case ParseTreeType.NEW_EXPRESSION:
+        case ParseTreeType.OBJECT_LITERAL_EXPRESSION:
         case ParseTreeType.PAREN_EXPRESSION:
+        case ParseTreeType.POSTFIX_EXPRESSION:
+        case ParseTreeType.QUASI_LITERAL_EXPRESSION:
         case ParseTreeType.SUPER_EXPRESSION:
+        case ParseTreeType.THIS_EXPRESSION:
+        case ParseTreeType.UNARY_EXPRESSION:
           return true;
         default:
           return false;
@@ -179,6 +178,7 @@ traceur.define('syntax.trees', function() {
         case ParseTreeType.ARRAY_LITERAL_EXPRESSION:
         case ParseTreeType.OBJECT_LITERAL_EXPRESSION:
         case ParseTreeType.PAREN_EXPRESSION:
+        case ParseTreeType.QUASI_LITERAL_EXPRESSION:
         // FunctionExpression
         case ParseTreeType.FUNCTION_DECLARATION:
         // MemberExpression [ Expression ]
@@ -188,6 +188,7 @@ traceur.define('syntax.trees', function() {
         // CallExpression:
         //   CallExpression . IdentifierName
         case ParseTreeType.CALL_EXPRESSION:
+        case ParseTreeType.CASCADE_EXPRESSION:
           return true;
 
         // new MemberExpression Arguments
@@ -245,7 +246,7 @@ traceur.define('syntax.trees', function() {
         case ParseTreeType.IF_STATEMENT:
         case ParseTreeType.DO_WHILE_STATEMENT:
         case ParseTreeType.WHILE_STATEMENT:
-        case ParseTreeType.FOR_EACH_STATEMENT:
+        case ParseTreeType.FOR_OF_STATEMENT:
         case ParseTreeType.FOR_IN_STATEMENT:
         case ParseTreeType.FOR_STATEMENT:
         case ParseTreeType.CONTINUE_STATEMENT:
@@ -294,6 +295,7 @@ traceur.define('syntax.trees', function() {
 
   return {
     getTreeNameForType: getTreeNameForType,
-    ParseTree: ParseTree
+    ParseTree: ParseTree,
+    ParseTreeType: ParseTreeType
   };
 });

@@ -1,4 +1,4 @@
-function forInGenerator2() {
+function* forInGenerator2() {
   var object = {
     a: 0,
     b: 1,
@@ -17,7 +17,7 @@ function forInGenerator2() {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

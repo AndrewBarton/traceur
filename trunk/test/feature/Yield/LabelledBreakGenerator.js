@@ -1,4 +1,4 @@
-function labelledBreakGenerator() {
+function* labelledBreakGenerator() {
   var x = 1;
   var y = 2;
 label:
@@ -23,7 +23,7 @@ label:
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

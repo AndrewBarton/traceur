@@ -1,5 +1,5 @@
 // yield form within a catch block
-function tryCatchYieldGenerator() {
+function* tryCatchYieldGenerator() {
   var x = 3;
   try {
     throw 5;
@@ -10,7 +10,7 @@ function tryCatchYieldGenerator() {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

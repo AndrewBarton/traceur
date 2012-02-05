@@ -1,16 +1,16 @@
 class StaticA {
-  class sa = 'sa';
-  class function sma() {}
+  static sa = 'sa';
+  static function sma() {}
 }
 
-class StaticB : StaticA {
-  class sb = 'sb';
-  class function smb() {}
+class StaticB extends StaticA {
+  static sb = 'sb';
+  static function smb() {}
 }
 
-class StaticC : StaticB {
-  class sc = 'sc';
-  class function smc() {}
+class StaticC extends StaticB {
+  static sc = 'sc';
+  static function smc() {}
 }
 
 // ----------------------------------------------------------------------------

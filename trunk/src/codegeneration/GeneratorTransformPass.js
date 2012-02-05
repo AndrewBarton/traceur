@@ -21,18 +21,20 @@ traceur.define('codegeneration', function() {
   var SetAccessor = traceur.syntax.trees.SetAccessor;
 
   var ParseTreeTransformer = traceur.codegeneration.ParseTreeTransformer;
-  var ForEachTransformer = traceur.codegeneration.ForEachTransformer;
+  var ForOfTransformer = traceur.codegeneration.ForOfTransformer;
 
   var ForInTransformPass = traceur.codegeneration.generator.ForInTransformPass;
   var GeneratorTransformer = traceur.codegeneration.generator.GeneratorTransformer;
   var AsyncTransformer = traceur.codegeneration.generator.AsyncTransformer;
 
-  var createForEachStatement = traceur.codegeneration.ParseTreeFactory.createForEachStatement;
+  var createForOfStatement = traceur.codegeneration.ParseTreeFactory.createForOfStatement;
   var createVariableDeclarationList = traceur.codegeneration.ParseTreeFactory.createVariableDeclarationList;
   var createYieldStatement = traceur.codegeneration.ParseTreeFactory.createYieldStatement;
   var createIdentifierExpression = traceur.codegeneration.ParseTreeFactory.createIdentifierExpression;
 
   var TokenType = traceur.syntax.TokenType;
+
+  var options = traceur.options.transform;
 
   /**
    * Can tell you if function body contains a yield statement. Does not search into
@@ -81,8 +83,8 @@ traceur.define('codegeneration', function() {
   });
 
   /**
-   * This transformer turns "yield for E" into a ForEach that
-   * contains a yield and is lowered by the ForEachTransformer.
+   * This transformer turns "yield* E" into a ForOf that
+   * contains a yield and is lowered by the ForOfTransformer.
    */
   function YieldForTransformer(identifierGenerator) {
     ParseTreeTransformer.call(this);
@@ -98,13 +100,14 @@ traceur.define('codegeneration', function() {
 
     transformYieldStatement: function(tree) {
       if (tree.isYieldFor) {
-        // yield for E
+        // yield* E
         //   becomes
-        // for (var $TEMP : E) { yield $TEMP; }
+        // for (var $TEMP of E) { yield $TEMP; }
 
-        var id = createIdentifierExpression(this.identifierGenerator_.generateUniqueIdentifier());
+        var id = createIdentifierExpression(
+            this.identifierGenerator_.generateUniqueIdentifier());
 
-        var forEach = createForEachStatement(
+        var forEach = createForOfStatement(
             createVariableDeclarationList(
                 TokenType.VAR,
                 id,
@@ -113,7 +116,7 @@ traceur.define('codegeneration', function() {
             tree.expression,
             createYieldStatement(id, false /* isYieldFor */));
 
-        var result = ForEachTransformer.transformTree(
+        var result = ForOfTransformer.transformTree(
             this.identifierGenerator_,
             forEach);
 
@@ -125,8 +128,8 @@ traceur.define('codegeneration', function() {
   });
 
   /**
-   * This pass just finds function bodies with yields in them and passes them off to
-   * the GeneratorTransformer for the heavy lifting.
+   * This pass just finds function bodies with yields in them and passes them
+   * off to the GeneratorTransformer for the heavy lifting.
    * @param {UniqueIdentifierGenerator} identifierGenerator
    * @param {ErrorReporter} reporter
    * @extends {ParseTreeTransformer}
@@ -140,7 +143,8 @@ traceur.define('codegeneration', function() {
 
   GeneratorTransformPass.transformTree = function(identifierGenerator, reporter,
       tree) {
-    return new GeneratorTransformPass(identifierGenerator, reporter).transformAny(tree);
+    return new GeneratorTransformPass(identifierGenerator, reporter).
+        transformAny(tree);
   }
 
   GeneratorTransformPass.prototype = traceur.createObject(
@@ -158,6 +162,7 @@ traceur.define('codegeneration', function() {
       return new FunctionDeclaration(
           null,
           tree.name,
+          false, // The generator has been transformed away.
           tree.isStatic,
           tree.formalParameterList,
           body);
@@ -177,22 +182,28 @@ traceur.define('codegeneration', function() {
         return body;
       }
 
-      // We need to transform for-in loops because the object key iteration cannot be interrupted.
-      if (finder.hasForIn) {
-        body = ForInTransformPass.transformTree(this.identifierGenerator_, body);
+      // We need to transform for-in loops because the object key iteration
+      // cannot be interrupted.
+      if (finder.hasForIn &&
+          (options.generators || options.deferredFunctions)) {
+        body = ForInTransformPass.transformTree(this.identifierGenerator_,
+                                                body);
       }
 
-      if (finder.hasYieldFor) {
-        body = YieldForTransformer.transformTree(this.identifierGenerator_, body);
+      if (finder.hasYieldFor && options.generators) {
+        body = YieldForTransformer.transformTree(this.identifierGenerator_,
+                                                 body);
       }
 
-      var transformed;
       if (finder.hasYield) {
-        transformed = GeneratorTransformer.transformGeneratorBody(this.reporter_, body);
-      } else {
-        transformed = AsyncTransformer.transformAsyncBody(this.reporter_, body);
+        if (options.generators) {
+          body = GeneratorTransformer.transformGeneratorBody(this.reporter_,
+                                                             body);
+        }
+      } else if (options.deferredFunctions) {
+        body = AsyncTransformer.transformAsyncBody(this.reporter_, body);
       }
-      return transformed;
+      return body;
     },
 
     /**

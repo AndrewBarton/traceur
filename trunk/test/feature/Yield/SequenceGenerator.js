@@ -1,4 +1,4 @@
-function sequenceGenerator() {
+function* sequenceGenerator() {
   var i = 1;
   yield i;
   i = 3;
@@ -12,7 +12,7 @@ function sequenceGenerator() {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

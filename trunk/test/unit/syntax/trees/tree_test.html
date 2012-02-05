@@ -44,8 +44,8 @@ function testParseTree() {
 }
 
 function testParseTree2() {
-  var tree = new ParseTree(ParseTreeType.NULL, 'location');
-  assertEquals(ParseTreeType.NULL, tree.type);
+  var tree = new ParseTree(ParseTreeType.NULL_TREE, 'location');
+  assertEquals(ParseTreeType.NULL_TREE, tree.type);
   assertEquals(true, tree.isNull());
   assertEquals(false, tree.isPattern());
 }
@@ -54,6 +54,7 @@ function validateTree(constr, type, fields) {
   function TestTree() {
     constr.apply(this, fields);
   }
+  TestTree.prototype = Object.create(constr.prototype);
 
   var tree = new TestTree();
   assertEquals(type, tree.type);
@@ -77,7 +78,7 @@ function validateTree(constr, type, fields) {
 function testNullTree() {
   // NullTree is a singleton so it needs its own test
   var tree = new traceur.syntax.trees.NullTree();
-  assertEquals('NULL', tree.type);
+  assertEquals('NULL_TREE', tree.type);
   assertEquals(null, tree.location);
   var tree2 = new traceur.syntax.trees.NullTree();
   assertEquals(tree, tree2);
@@ -123,7 +124,7 @@ function testTreeConstructors() {
 
   validateTree(traceur.syntax.trees.Catch,
       ParseTreeType.CATCH,
-      ['location', 'exceptionName', 'catchBody']);
+      ['location', 'identifier', 'catchBody']);
 
   validateTree(traceur.syntax.trees.ClassDeclaration,
       ParseTreeType.CLASS_DECLARATION,
@@ -169,21 +170,13 @@ function testTreeConstructors() {
       ParseTreeType.EXPORT_DECLARATION,
       ['location', 'declaration']);
 
-  validateTree(traceur.syntax.trees.ExportPathList,
-    ParseTreeType.EXPORT_PATH_LIST,
+  validateTree(traceur.syntax.trees.ExportMappingList,
+    ParseTreeType.EXPORT_MAPPING_LIST,
     ['location', 'paths']);
 
-  validateTree(traceur.syntax.trees.ExportPathSpecifierSet,
-    ParseTreeType.EXPORT_PATH_SPECIFIER_SET,
-    ['location', 'specifiers']);
-
-  validateTree(traceur.syntax.trees.ExportPath,
-    ParseTreeType.EXPORT_PATH,
-    ['location', 'moduleExpression', 'specifier']);
-
-  validateTree(traceur.syntax.trees.ExportPathSpecifier,
-    ParseTreeType.EXPORT_PATH_SPECIFIER,
-    ['location', 'identifier', 'specifier']);
+  validateTree(traceur.syntax.trees.ExportMapping,
+    ParseTreeType.EXPORT_MAPPING,
+    ['location', 'moduleExpression', 'specifierSet']);
 
   validateTree(traceur.syntax.trees.ExportSpecifier,
     ParseTreeType.EXPORT_SPECIFIER,
@@ -205,8 +198,8 @@ function testTreeConstructors() {
       ParseTreeType.FINALLY,
       ['location', 'block']);
 
-  validateTree(traceur.syntax.trees.ForEachStatement,
-      ParseTreeType.FOR_EACH_STATEMENT,
+  validateTree(traceur.syntax.trees.ForOfStatement,
+      ParseTreeType.FOR_OF_STATEMENT,
       ['location', 'initializer', 'collection', 'body']);
 
   validateTree(traceur.syntax.trees.ForInStatement,
@@ -223,7 +216,8 @@ function testTreeConstructors() {
 
   validateTree(traceur.syntax.trees.FunctionDeclaration,
       ParseTreeType.FUNCTION_DECLARATION,
-      ['location', 'name', 'isStatic', 'formalParameterList', 'functionBody']);
+      ['location', 'name', 'isGenerator',
+       'isStatic', 'formalParameterList', 'functionBody']);
 
   validateTree(traceur.syntax.trees.GetAccessor,
       ParseTreeType.GET_ACCESSOR,
@@ -241,8 +235,8 @@ function testTreeConstructors() {
       ParseTreeType.IMPORT_DECLARATION,
       ['location', 'importPathList']);
 
-  validateTree(traceur.syntax.trees.ImportPath,
-      ParseTreeType.IMPORT_PATH,
+  validateTree(traceur.syntax.trees.ImportBinding,
+      ParseTreeType.IMPORT_BINDING,
       ['location', 'moduleExpression', 'importSpecifierSet']);
 
   validateTree(traceur.syntax.trees.ImportSpecifier,
@@ -333,6 +327,10 @@ function testTreeConstructors() {
       ParseTreeType.PROGRAM,
       ['location', 'programElements']);
 
+  validateTree(traceur.syntax.trees.PropertyMethodAssignment,
+      ParseTreeType.PROPERTY_METHOD_ASSIGNMENT,
+      ['location', 'name', 'formalParameterList', 'functionBody']);
+
   validateTree(traceur.syntax.trees.PropertyNameAssignment,
       ParseTreeType.PROPERTY_NAME_ASSIGNMENT,
       ['location', 'name', 'value']);
@@ -340,10 +338,6 @@ function testTreeConstructors() {
   validateTree(traceur.syntax.trees.PropertyNameShorthand,
       ParseTreeType.PROPERTY_NAME_SHORTHAND,
       ['location', 'name']);
-
-  validateTree(traceur.syntax.trees.QualifiedReference,
-      ParseTreeType.QUALIFIED_REFERENCE,
-      ['location', 'moduleExpression', 'identifier']);
 
   validateTree(traceur.syntax.trees.RequiresMember,
       ParseTreeType.REQUIRES_MEMBER,

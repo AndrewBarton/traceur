@@ -1,4 +1,4 @@
-// Copyright 2011 Google Inc.
+// Copyright 2012 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ var traceur = (function() {
   }
 
   function assert(b) {
-    if (!b)
+    if (!b && traceur.options.debug)
       throw Error('Assertion failed');
   }
 
@@ -124,6 +124,7 @@ var traceur = (function() {
   };
 
   var scripts = [
+    'options.js',
     'util/util.js',
     'util/ArrayMap.js',
     'util/ObjectMap.js',
@@ -139,7 +140,6 @@ var traceur = (function() {
     'syntax/SourceFile.js',
     'syntax/Scanner.js',
     'syntax/PredefinedName.js',
-    'syntax/trees/ParseTreeType.js',
     'syntax/trees/ParseTree.js',
     'syntax/trees/NullTree.js',
     'syntax/trees/ParseTrees.js',
@@ -171,18 +171,24 @@ var traceur = (function() {
     'codegeneration/ParseTreeFactory.js',
     'codegeneration/ParseTreeTransformer.js',
     'codegeneration/ArrowFunctionTransformer.js',
+    'codegeneration/PropertyMethodAssignmentTransformer.js',
     'codegeneration/PropertyNameShorthandTransformer.js',
     'codegeneration/AlphaRenamer.js',
+    'codegeneration/ArgumentsFinder.js',
     'codegeneration/DestructuringTransformer.js',
     'codegeneration/DefaultParametersTransformer.js',
     'codegeneration/RestParameterTransformer.js',
     'codegeneration/SpreadTransformer.js',
     'codegeneration/UniqueIdentifierGenerator.js',
-    'codegeneration/ForEachTransformer.js',
+    'codegeneration/ForOfTransformer.js',
     'codegeneration/ModuleTransformer.js',
     'codegeneration/FunctionTransformer.js',
+    'codegeneration/CascadeExpressionTransformer.js',
     'codegeneration/ClassTransformer.js',
     'codegeneration/BlockBindingTransformer.js',
+    'codegeneration/QuasiLiteralTransformer.js',
+    'codegeneration/CollectionTransformer.js',
+    'codegeneration/IsExpressionTransformer.js',
     'codegeneration/generator/ForInTransformPass.js',
     'codegeneration/generator/State.js',
     'codegeneration/generator/FallThroughState.js',

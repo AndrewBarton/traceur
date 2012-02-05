@@ -15,20 +15,22 @@
 traceur.define('codegeneration', function() {
   'use strict';
 
-  var ParseTreeTransformer = traceur.codegeneration.ParseTreeTransformer;
-  var ParseTreeFactory = traceur.codegeneration.ParseTreeFactory;
   var AlphaRenamer = traceur.codegeneration.AlphaRenamer;
-
-  var PredefinedName = traceur.syntax.PredefinedName;
-  var TokenType = traceur.syntax.TokenType;
-  var ParseTreeType = traceur.syntax.trees.ParseTreeType;
+  var ArgumentsFinder = traceur.codegeneration.ArgumentsFinder;
   var ArrayPattern = traceur.syntax.trees.ArrayPattern;
   var BinaryOperator = traceur.syntax.trees.BinaryOperator;
-  var ObjectPatternField = traceur.syntax.trees.ObjectPatternField;
+  var BindingIdentifier = traceur.syntax.trees.BindingIdentifier;
   var ObjectPattern = traceur.syntax.trees.ObjectPattern;
+  var ObjectPatternField = traceur.syntax.trees.ObjectPatternField;
   var ParseTree = traceur.syntax.trees.ParseTree;
-  var VariableDeclarationList = traceur.syntax.trees.VariableDeclarationList;
+  var ParseTreeFactory = traceur.codegeneration.ParseTreeFactory;
+  var ParseTreeTransformer = traceur.codegeneration.ParseTreeTransformer;
+  var ParseTreeType = traceur.syntax.trees.ParseTreeType;
+  var ParseTreeVisitor = traceur.syntax.ParseTreeVisitor;
+  var PredefinedName = traceur.syntax.PredefinedName;
+  var TokenType = traceur.syntax.TokenType;
   var VariableDeclaration = traceur.syntax.trees.VariableDeclaration;
+  var VariableDeclarationList = traceur.syntax.trees.VariableDeclarationList;
 
   var createArgumentList = ParseTreeFactory.createArgumentList;
   var createAssignmentStatement = ParseTreeFactory.createAssignmentStatement;
@@ -47,6 +49,10 @@ traceur.define('codegeneration', function() {
   var createThisExpression = ParseTreeFactory.createThisExpression;
   var createVariableDeclaration = ParseTreeFactory.createVariableDeclaration;
   var createVariableDeclarationList = ParseTreeFactory.createVariableDeclarationList;
+
+  function toBindingIdentifier(tree) {
+    return new BindingIdentifier(tree.location, tree.identifierToken);
+  }
 
   /**
    * Collects assignments in the desugaring of a pattern.
@@ -90,6 +96,9 @@ traceur.define('codegeneration', function() {
   VariableDeclarationDesugaring.prototype = traceur.createObject(
       Desugaring.prototype, {
     assign: function(lvalue, rvalue) {
+      // TODO(arv): This should go away when destructuring is refactored.
+      if (lvalue.type == ParseTreeType.IDENTIFIER_EXPRESSION)
+        lvalue = toBindingIdentifier(lvalue);
       this.declarations.push(createVariableDeclaration(lvalue, rvalue));
     }
   });
@@ -166,20 +175,36 @@ traceur.define('codegeneration', function() {
       this.desugarPattern_(desugaring, lvalue);
       desugaring.statements.push(createReturnStatement(desugaring.rvalue));
 
-      var func = createFunctionExpression(
-          createParameterList(
-              PredefinedName.getParameterName(0),
-              PredefinedName.CAPTURED_ARGUMENTS),
-          AlphaRenamer.rename(
-              createBlock(desugaring.statements),
-              PredefinedName.ARGUMENTS,
-              PredefinedName.CAPTURED_ARGUMENTS));
+      var finder = new ArgumentsFinder(lvalue);
+      if (finder.hasArguments) {
+        // function($0, $arguments) { alpha renamed body }
+        var func = createFunctionExpression(
+            createParameterList(
+                PredefinedName.getParameterName(0),
+                PredefinedName.CAPTURED_ARGUMENTS),
+            AlphaRenamer.rename(
+                createBlock(desugaring.statements),
+                PredefinedName.ARGUMENTS,
+                PredefinedName.CAPTURED_ARGUMENTS));
 
+        // (func).call(this, rvalue, arguments)
+        return createCallCall(
+            createParenExpression(func),
+            createThisExpression(),
+            rvalue,
+            createIdentifierExpression(PredefinedName.ARGUMENTS));
+      }
+
+      // function($0) { body }
+      var func = createFunctionExpression(
+            createParameterList(PredefinedName.getParameterName(0)),
+            createBlock(desugaring.statements));
+
+      // (func).call(this, rvalue)
       return createCallCall(
           createParenExpression(func),
           createThisExpression(),
-          rvalue,
-          createIdentifierExpression(PredefinedName.ARGUMENTS));
+          rvalue);
     },
 
     /**

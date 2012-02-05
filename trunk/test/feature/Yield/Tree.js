@@ -1,21 +1,24 @@
 // A binary tree class.
 class Tree {
-  new(label, left, right) {
+  constructor(label, left, right) {
     this.label = label;
     this.left = left;
     this.right = right;
   }
-
-  function __iterator__() {
-    if (this.left) {
-      yield for this.left;
-    }
-    yield this.label;
-    if (this.right) {
-      yield for this.right;
-    }
-  }
 }
+
+// We don't yet support any syntax to set private named fields in classes.
+var {iterator} = traceur.runtime.modules['@iter'];
+
+Tree.prototype[iterator] = function*() {
+  if (this.left) {
+    yield* this.left;
+  }
+  yield this.label;
+  if (this.right) {
+    yield* this.right;
+  }
+};
 
 // Create a Tree from a list.
 function tree(list) {
@@ -28,20 +31,20 @@ function tree(list) {
 }
 
 // A recursive generator that generates Tree labels in in-order.
-function inorder1(t) {
+function* inorder1(t) {
   if (t) {
-    for (var x : inorder1(t.left)) {
+    for (var x of inorder1(t.left)) {
       yield x;
     }
     yield t.label;
-    for (var x : inorder1(t.right)) {
+    for (var x of inorder1(t.right)) {
       yield x;
     }
   }
 }
 
 // A non-recursive generator.
-function inorder2(node) {
+function* inorder2(node) {
   var stack = [];
   while (node) {
     while (node.left) {
@@ -59,7 +62,7 @@ function inorder2(node) {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;
@@ -71,4 +74,4 @@ var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var root = tree(alphabet);
 assertEquals(alphabet, accumulate(inorder1(root)));
 assertEquals(alphabet, accumulate(inorder2(root)));
-// TODO(jmesserly) assertEquals(alphabet, accumulate(root));
+assertEquals(alphabet, accumulate(root));

@@ -21,8 +21,8 @@ function importScript(filename) {
  * Show a failure message for the given script.
  */
 function failScript(script, message) {
-  console.log('\x1B[31mFAIL\x1B[0m ' + script);
-  console.log('     ' + message);
+  clearLastLine();
+  print(red('FAIL ') + script + '\n     ' + message + '\n\n');
 }
 
 // Define some rudimentary versions of the JSUnit assertions that the
@@ -109,83 +109,143 @@ var asserts = {
  * Load, compile, and execute the feature script at the given path.
  */
 function testScript(filePath) {
-  var script = fs.readFileSync(filePath, 'utf8');
-  if (!script) {
+  var source = fs.readFileSync(filePath, 'utf8');
+  if (!source) {
     failScript(filePath, 'Could not read file.');
     return false;
   }
 
-  if (script.indexOf('// Only in browser') == 0) {
-    return true;
-  }
-
-  var reporter = new traceur.util.ErrorReporter();
-  var sourceFile = new traceur.syntax.SourceFile(filePath, script);
-  var tree = traceur.codegeneration.Compiler.compileFile(reporter,
-                                                         sourceFile,
-                                                         filePath);
-
-
-  if (script.indexOf('// Should not compile') == 0) {
-    if (!reporter.hadError()) {
-      // Script should not compile.
-      failScript(filePath, 'Compile error expected.');
-      return false;
+  var onlyInBrowser = false;
+  var skip = false;
+  var shouldCompile = true;
+  forEachPrologLine(source, function(line) {
+    var m;
+    if (line.indexOf('// Only in browser.') === 0) {
+      onlyInBrowser = true;
+    } else if (line.indexOf('// Should not compile.') === 0) {
+      shouldCompile = false;
+    } else if (line.indexOf('// Skip.') === 0) {
+      skip = true;
+    } else if ((m = /\/\ Options:\s*(.+)/.exec(line))) {
+      traceur.options.fromString(m[1]);
     }
+  });
+
+  if (skip || onlyInBrowser) {
+
     return true;
   }
-
-  if (reporter.hadError()) {
-    failScript(filePath, 'Unexpected compile error in script.');
-    return false;
-  }
-
-  var javascript = traceur.codegeneration.ParseTreeWriter.write(tree, false);
 
   try {
-    testScriptInContext(javascript);
-    return true;
-  } catch (e) {
-    if (e instanceof UnitTestError) {
-      failScript(filePath, e.message);
-    } else if (e instanceof SyntaxError) {
-      failScript(filePath, 'Compiled to invalid Javascript. Source:\n\n     ' +
-          javascript.trim().replace(/\n/g, '\n     ') + '\n\n' +
-          '     ' + e.toString());
-    } else {
-      failScript(filePath, 'Unexpected exception:\n' + e.toString());
+    silenceConsole();
+
+    var reporter = new traceur.util.ErrorReporter();
+    var sourceFile = new traceur.syntax.SourceFile(filePath, source);
+    var tree = traceur.codegeneration.Compiler.compileFile(reporter,
+                                                           sourceFile,
+                                                           filePath);
+
+    if (!shouldCompile) {
+      if (!reporter.hadError()) {
+        // Script should not compile.
+        failScript(filePath, 'Compile error expected.');
+        return false;
+      }
+      return true;
     }
+
+    if (reporter.hadError()) {
+      failScript(filePath, 'Unexpected compile error in script.');
+      return false;
+    }
+
+    var javascript = traceur.codegeneration.ParseTreeWriter.write(tree, false);
+
+    try {
+      traceur.strictGlobalEval(javascript);
+      return true;
+    } catch (e) {
+      if (e instanceof UnitTestError) {
+        failScript(filePath, e.message);
+      } else if (e instanceof SyntaxError) {
+        failScript(filePath,
+            'Compiled to invalid Javascript. Source:\n\n     ' +
+            javascript.trim().replace(/\n/g, '\n     ') + '\n\n' +
+            '     ' + e);
+      } else {
+        failScript(filePath, 'Unexpected exception:\n' + e);
+      }
+    }
+
+  } finally {
+    traceur.options.reset();
+    restoreConsole();
   }
 
   return false;
+}
+
+function forEachPrologLine(s, f) {
+  var inProlog = true;
+  for (var i = 0; inProlog && i < s.length; ) {
+    var j = s.indexOf('\n', i);
+    if (j == -1)
+      break;
+    if (s[i] === '/' && s[i + 1] === '/') {
+      var line = s.slice(i, j);
+      f(line);
+      i = j + 1;
+    } else {
+      inProlog = false;
+    }
+  }
+}
+
+var originalConsole;
+
+function silenceConsole() {
+  // TODO(rnystrom): Hack. Don't let Traceur spew all over our beautiful
+  // test results.
+  if (originalConsole)
+    throw new Error('Unbalanced call to silenceConsole');
+
+  originalConsole = {
+    log: console.log,
+    info: console.info,
+    error: console.error
+  };
+
+  console.log = console.info = console.error = function() {};
+}
+
+function restoreConsole() {
+  if (!originalConsole)
+    throw new Error('Unbalanced call to restoreConsole');
+
+  console.log = originalConsole.log;
+  console.info = originalConsole.info;
+  console.error = originalConsole.error;
+  originalConsole = null;
 }
 
 function UnitTestError(message) {
   this.message = message;
 }
 
-/**
- * Feature scripts are evaluated in the context of this function, so it contains
- * the functions that the scripts need access to.
- */
-function testScriptInContext(javascript) {
-  'use strict';
+function print(s) {
+  process.stdout.write(s);
+}
 
-  // TODO(rnystrom): Hack. Don't let Traceur spew all over our beautiful
-  // test results.
-  var oldConsole = global.console;
+function green(s) {
+  return '\x1B[32m' + s + '\x1B[0m';
+}
 
-  console = global.console = {
-    log: function() {},
-    info: function() {},
-    error: function() {}
-  };
+function red(s) {
+  return '\x1B[31m' + s + '\x1B[0m';
+}
 
-  try {
-    traceur.strictGlobalEval(javascript);
-  } finally {
-    global.console = oldConsole;
-  }
+function clearLastLine() {
+  print('\x1B[1A\x1B[K');
 }
 
 /**
@@ -199,8 +259,18 @@ function runFeatureScripts(dir) {
     if (stat.isDirectory()) {
       runFeatureScripts(filePath);
     } else if (path.extname(filePath) == '.js') {
+      clearLastLine();
+      if (passes === tests) {
+        print('Passed ' + green(passes) + ' so far. Testing: ' + filePath);
+      } else {
+        print('Passed ' + green(passes) + ' and failed ' +
+              red(tests - passes) + ' Testing: ' + filePath);
+      }
+      print('\n');
+
       tests++;
-      if (testScript(filePath)) passes++;
+      if (testScript(filePath))
+        passes++;
     }
   }
 }
@@ -222,10 +292,10 @@ var tests  = 0;
 var passes = 0;
 runFeatureScripts('feature');
 
+clearLastLine();
 if (passes == tests) {
-  console.log('Passed all \x1B[32m' + tests + '\x1B[0m tests.');
+  print('Passed all ' + green(tests) + ' tests.\n');
 } else {
-  console.log();
-  console.log('Passed \x1B[32m' + passes + '\x1B[0m and failed \x1B[31m' +
-      (tests - passes) + '\x1B[0m out of ' + tests + ' tests.');
+  print('\nPassed ' + green(passes) + ' and failed ' + red(tests - passes) +
+        ' out of ' + tests + ' tests.\n');
 }

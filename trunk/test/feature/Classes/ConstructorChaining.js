@@ -1,11 +1,11 @@
 class ConstructorA {
-  new(x) {
+  constructor(x) {
     this.x = x;
   }
 }
 
-class ConstructorB : ConstructorA {
-  new(x, y) {
+class ConstructorB extends ConstructorA {
+  constructor(x, y) {
     super(x);
     this.y = y;
   }

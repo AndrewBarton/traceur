@@ -22,7 +22,7 @@ function iterateElements(array) {
   };
 }
 
-function iterateElements2(array) {
+function* iterateElements2(array) {
   for (var index = 0; index < array.length; index++) {
     yield array[index];
   }
@@ -42,7 +42,7 @@ function fib(max) {
 }
 
 // infinite list
-function fib2() {
+function* fib2() {
   var a = 0, b = 1;
   while (true) {
     yield b;
@@ -71,13 +71,13 @@ function tree(list) {
 }
 
 // A recursive generator that generates Tree labels in in-order.
-function inorder1(t) {
+function* inorder1(t) {
   if (t) {
-    for (var x : inorder1(t.left)) {
+    for (var x of inorder1(t.left)) {
       yield x;
     }
     yield t.label;
-    for (var x : inorder1(t.right)) {
+    for (var x of inorder1(t.right)) {
       yield x;
     }
   }
@@ -87,13 +87,13 @@ function inorder1(t) {
 var root = tree('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 // Print the nodes of the tree in in-order.
 var result = '';
-for (let x : inorder1(root)) {
+for (let x of inorder1(root)) {
   result += x;
 }
 alert(result);
 
 // A non-recursive generator.
-function inorder2(node) {
+function* inorder2(node) {
   var stack = [];
   while (node) {
     while (node.left) {
@@ -111,7 +111,7 @@ function inorder2(node) {
 
 // Exercise the non-recursive generator.
 var result = '';
-for (var x : inorder2(root)) {
+for (var x of inorder2(root)) {
   result += x;
 }
 alert(result);
@@ -119,13 +119,13 @@ alert(result);
 // Example 4. map and filter
 
 // These can be combined without creating intermediate arrays
-function map(list, fun) {
-  for (var item : list) {
+function* map(list, fun) {
+  for (var item of list) {
     yield fun(item);
   }
 }
-function filter(list, fun) {
-  for (var item : list) {
+function* filter(list, fun) {
+  for (var item of list) {
     if (fun(item)) {
       yield item;
     }
@@ -139,7 +139,7 @@ var squares = map(
     function(x) { return x * x; });
 
 numbers = [];
-for (let s : squares) {
+for (let s of squares) {
   numbers.push(s);
 }
 alert(numbers.join('_'));

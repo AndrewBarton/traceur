@@ -1,4 +1,4 @@
-// Copyright 2011 Google Inc.
+// Copyright 2012 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ traceur.define('codegeneration', function() {
   var ParseTreeValidator = traceur.syntax.ParseTreeValidator;
   var ProgramTree = traceur.syntax.trees.ProgramTree;
   var UniqueIdentifierGenerator = traceur.codegeneration.UniqueIdentifierGenerator;
-  var ForEachTransformer = traceur.codegeneration.ForEachTransformer;
+  var ForOfTransformer = traceur.codegeneration.ForOfTransformer;
+  var PropertyMethodAssignmentTransformer = traceur.codegeneration.PropertyMethodAssignmentTransformer;
   var PropertyNameShorthandTransformer = traceur.codegeneration.PropertyNameShorthandTransformer;
   var RestParameterTransformer = traceur.codegeneration.RestParameterTransformer;
   var DefaultParametersTransformer = traceur.codegeneration.DefaultParametersTransformer;
@@ -31,12 +32,17 @@ traceur.define('codegeneration', function() {
   var TraitTransformer = traceur.codegeneration.TraitTransformer;
   var ClassTransformer = traceur.codegeneration.ClassTransformer;
   var ModuleTransformer = traceur.codegeneration.ModuleTransformer;
-  var GeneratorTransformPass = traceur.codegeneration.GeneratorTransformPass;
   var FreeVariableChecker = traceur.semantics.FreeVariableChecker;
   var ArrowFunctionTransformer = traceur.codegeneration.ArrowFunctionTransformer;
+  var QuasiLiteralTransformer = traceur.codegeneration.QuasiLiteralTransformer;
+  var CollectionTransformer = traceur.codegeneration.CollectionTransformer;
+  var CascadeExpressionTransformer = traceur.codegeneration.CascadeExpressionTransformer;
+  var IsExpressionTransformer = traceur.codegeneration.IsExpressionTransformer;
 
   var CLASS_DECLARATION = traceur.syntax.trees.ParseTreeType.CLASS_DECLARATION;
   var TRAIT_DECLARATION = traceur.syntax.trees.ParseTreeType.TRAIT_DECLARATION;
+
+  var options = traceur.options.transform;
 
   /**
    * Transforms a Traceur file's ParseTree to a JS ParseTree.
@@ -136,67 +142,78 @@ traceur.define('codegeneration', function() {
     },
 
     transformTree_: function(tree, opt_module) {
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
+      var reporter = this.reporter_;
+
+      function chain(enabled, transformer) {
+        if (!enabled)
+          return;
+
+        if (!reporter.hadError()) {
+          if (traceur.options.validate) {
+            ParseTreeValidator.validate(tree);
+          }
+          tree = transformer(tree) || tree;
+        }
+      }
+
+      if (options.modules && !this.reporter_.hadError()) {
+        if (traceur.options.validate) {
+          ParseTreeValidator.validate(tree);
+        }
         tree = this.transformModules_(tree, opt_module);
       }
+
       // TODO: many of these simple, local transforms could happen in the same
       // tree pass
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        tree = ArrowFunctionTransformer.transformTree(this.reporter_, tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        tree = PropertyNameShorthandTransformer.transformTree(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        tree = this.transformAggregates_(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        // foreach must come before destructuring and generator, or anything
-        // that wants to use VariableBinder
-        tree = ForEachTransformer.transformTree(
-            this.identifierGenerator_, tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        // rest parameters must come before generator
-        tree = RestParameterTransformer.transformTree(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        // default parameters should come after rest parameter to get the
-        // expected order in the transformed code.
-        tree = DefaultParametersTransformer.transformTree(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        // generator must come after foreach and rest parameters
-        tree = GeneratorTransformPass.transformTree(
-            this.identifierGenerator_, this.reporter_, tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        // destructuring must come after foreach and before block binding
-        tree = DestructuringTransformer.transformTree(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        tree = SpreadTransformer.transformTree(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
-        tree = BlockBindingTransformer.transformTree(tree);
-      }
-      if (!this.reporter_.hadError()) {
-        ParseTreeValidator.validate(tree);
 
-        // Issue errors for any unbound variables
-        FreeVariableChecker.checkProgram(this.reporter_, tree);
-      }
+      chain(options.quasi, QuasiLiteralTransformer.transformTree.bind(
+          null, this.identifierGenerator_));
+      chain(options.arrowFunctions,
+            ArrowFunctionTransformer.transformTree.bind(null, this.reporter_));
+      chain(options.propertyMethods,
+            PropertyMethodAssignmentTransformer.transformTree);
+      chain(options.propertyNameShorthand,
+            PropertyNameShorthandTransformer.transformTree);
+      chain(options.traceurClasses,
+            ClassTransformer.transform.bind(null, this.reporter_));
+      chain(options.isExpression, IsExpressionTransformer.transformTree);
+
+      // for of must come before destructuring and generator, or anything
+      // that wants to use VariableBinder
+      chain(options.forOf, ForOfTransformer.transformTree.bind(
+          null, this.identifierGenerator_));
+
+      // rest parameters must come before generator
+      chain(options.restParameters, RestParameterTransformer.transformTree);
+
+      // default parameters should come after rest parameter to get the
+      // expected order in the transformed code.
+      chain(options.defaultParameters,
+            DefaultParametersTransformer.transformTree);
+
+      // generator must come after for of and rest parameters
+      chain(options.generators || options.deferredFunctions,
+           GeneratorTransformPass.transformTree.bind(null,
+                                                     this.identifierGenerator_,
+                                                     this.reporter_));
+
+      // destructuring must come after for of and before block binding
+      chain(options.destructuring, DestructuringTransformer.transformTree);
+      chain(options.spread, SpreadTransformer.transformTree);
+      chain(options.blockBinding, BlockBindingTransformer.transformTree);
+
+      // Cascade must come before CollectionTransformer.
+      chain(options.cascadeExpression,
+            CascadeExpressionTransformer.transformTree.bind(null,
+            this.reporter_));
+
+      chain(options.collections || options.privateNames,
+            CollectionTransformer.transformTree);
+
+      // Issue errors for any unbound variables
+      chain(traceur.options.freeVariableChecker,
+            FreeVariableChecker.checkProgram.bind(null, this.reporter_));
+
       return tree;
     },
 
@@ -214,15 +231,6 @@ traceur.define('codegeneration', function() {
       } else {
         return ModuleTransformer.transform(this.project_, tree);
       }
-    },
-
-    /**
-     * @param {Program} tree
-     * @return {Program}
-     * @private
-     */
-    transformAggregates_: function(tree) {
-      return ClassTransformer.transform(this.reporter_, tree);
     }
   };
 

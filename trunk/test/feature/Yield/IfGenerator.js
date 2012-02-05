@@ -1,4 +1,4 @@
-function ifGenerator(condition) {
+function* ifGenerator(condition) {
   if (condition) {
     yield 1;
   }
@@ -14,7 +14,7 @@ function ifGenerator(condition) {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

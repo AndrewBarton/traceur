@@ -22,7 +22,6 @@ traceur.define('semantics', function() {
   var ClassDeclaration = traceur.syntax.trees.ClassDeclaration;
   var ExportDeclaration = traceur.syntax.trees.ExportDeclaration;
   var FieldDeclaration = traceur.syntax.trees.FieldDeclaration;
-  var FunctionDeclaration = traceur.syntax.trees.FunctionDeclaration;
   var GetAccessor = traceur.syntax.trees.GetAccessor;
   var MixinResolve = traceur.syntax.trees.MixinResolve;
   var Mixin = traceur.syntax.trees.Mixin;
@@ -46,6 +45,7 @@ traceur.define('semantics', function() {
   var GetAccessor = traceur.semantics.symbols.GetAccessor;
   var SetAccessor = traceur.semantics.symbols.SetAccessor;
   var RequiresSymbol = traceur.semantics.symbols.RequiresSymbol;
+  var Symbol = traceur.semantics.symbols.Symbol;
 
   /**
    * Analyzes a class or trait and creates an AggregateSymbol. This class just
@@ -157,7 +157,7 @@ traceur.define('semantics', function() {
     declareFieldMember_: function(aggregate, field, tree) {
       var name = null;
       switch (tree.lvalue.type) {
-        case ParseTreeType.IDENTIFIER_EXPRESSION:
+        case ParseTreeType.BINDING_IDENTIFIER:
           name = tree.lvalue.identifierToken.value;
           break;
         default:
@@ -165,8 +165,8 @@ traceur.define('semantics', function() {
           this.reportError_(tree, 'Cannot use destructuring in a field declaration');
           break;
       }
-      if (PredefinedName.NEW == name) {
-        this.reportError_(tree, 'Cannot name a field "new"');
+      if (PredefinedName.CONSTRUCTOR == name) {
+        this.reportError_(tree, 'Cannot name a field "constructor"');
         return;
       }
       if (!this.checkForDuplicateMemberDeclaration_(aggregate, tree, name, field.isStatic)) {
@@ -236,8 +236,8 @@ traceur.define('semantics', function() {
         default:
           throw new Error('Unexpected property name type');
       }
-      if (name == PredefinedName.NEW) {
-        this.reportError_(tree, 'Cannot name a property "new"');
+      if (name == PredefinedName.CONSTRUCTOR) {
+        this.reportError_(tree, 'Cannot name a property "constructor"');
         return null;
       }
       return name;
@@ -250,7 +250,7 @@ traceur.define('semantics', function() {
      */
     declareFunctionMember_: function(aggregate, tree) {
       // TODO: validate super constructor call
-      var name = tree.name.value;
+      var name = tree.name.identifierToken.value;
       if (!this.checkForDuplicateMemberDeclaration_(aggregate, tree, name, tree.isStatic)) {
         return new MethodSymbol(tree, name, aggregate, tree.isStatic);
       }

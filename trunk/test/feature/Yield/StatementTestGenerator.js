@@ -1,4 +1,4 @@
-function statementTestGenerator() {
+function* statementTestGenerator() {
   // all of these statement constructs should be allowed
   // provided that they contain no yield statements
   switch (1) {
@@ -14,9 +14,9 @@ function statementTestGenerator() {
 
   //TODO(jmesserly): this had to be changed to "var" until we get BlockBindingTransformer
   //for (let x in {}) {}
-  //for (let x : simpleGenerator()) {}
+  //for (let x of simpleGenerator()) {}
   for (var x in {}) {}
-  for (var x : simpleGenerator()) {}
+  for (var x of simpleGenerator()) {}
 
   if (false) {} else {}
   //TODO(jmesserly): this had to be changed to "var" until we get BlockBindingTransformer
@@ -28,7 +28,7 @@ function statementTestGenerator() {
 }
 
 
-function simpleGenerator() {
+function* simpleGenerator() {
   yield 1;
 }
 

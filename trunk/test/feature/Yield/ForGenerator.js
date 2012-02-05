@@ -1,4 +1,4 @@
-function forGenerator() {
+function* forGenerator() {
   var a = 1, b = 1;
   for (var i = 0; i < 4; i++) {
     // TODO(jmesserly): this was changed until we get destructing
@@ -14,7 +14,7 @@ function forGenerator() {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;

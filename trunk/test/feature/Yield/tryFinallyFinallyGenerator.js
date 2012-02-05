@@ -1,5 +1,5 @@
 // finally inside a try finally
-function tryFinallyFinallyGenerator() {
+function* tryFinallyFinallyGenerator() {
   var y;
 
   try {
@@ -18,7 +18,7 @@ function tryFinallyFinallyGenerator() {
 
 function accumulate(iterator) {
   var result = '';
-  for (var value : iterator) {
+  for (var value of iterator) {
     result = result + String(value);
   }
   return result;
